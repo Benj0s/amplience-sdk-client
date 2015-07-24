@@ -1127,14 +1127,14 @@ amp.get = function (assets, success, error, videoSort) {
         if(!isValid(assets))
             return;
         var url = amp.getAssetURL(assets);
-        jsonp(amp.getAssetURL(assets)+ '.js', assets.name, win(url), fail(url),assets.transform);
+        jsonp(amp.getAssetURL(assets)+ '.js', assets.name, win(url), fail(url),assets.transform, assets.metadata, assets.metafilter);
     }else{
         assLength = assets.length;
         for (var i = 0; i < assLength; i++) {
             if(!isValid(assets[i]))
                 continue;
             var url = amp.getAssetURL(assets[i]);
-            jsonp(url + '.js', assets[i].name, win(url), fail(url),assets.transform);
+            jsonp(url + '.js', assets[i].name, win(url), fail(url),assets.transform, assets[i].metadata, assets[i].metafilter);
         }
     }
 };
@@ -1218,12 +1218,20 @@ amp.clearJsonCache = function(){
     amp.jsonCache = {};
 }
 
-var jsonp =  amp.jsonp = function(url, name, success, error, transform){
+var jsonp =  amp.jsonp = function(url, name, success, error, transform, metadata, metafilter){
+    
+    if (!metadata) {
+        metadata = false;
+    }
+    
+    if (!metafilter) {
+        metafilter = '';
+    }
 
     if(!transform){
         transform = '';
     } else {
-        transform = transform+'&'
+        transform = transform+'&';
     }
     // do we already have the data?
     if(amp.jsonCache[name]) {
@@ -1245,7 +1253,7 @@ var jsonp =  amp.jsonp = function(url, name, success, error, transform){
         amp.jsonReturn(name,{ status:'error',code: 404, message: "Not Found", name: name });
     }, 10000);
 
-    var src = url + "?" + transform + buildQueryString({deep:true, timestamp: movingCacheWindow(), arg: "'"+name+"'", func:"amp.jsonReturn"});
+    var src = url + "?" + transform + buildQueryString({metadata: metadata, metaFilter: metafilter, deep:true, timestamp: movingCacheWindow(), arg: "'"+name+"'", func:"amp.jsonReturn"});
     var script = amp.get.createScript(src, function(e) {
         amp.jsonReturn(name,{ status:'error',code: 404, message: "Not Found", name: name });
     });
