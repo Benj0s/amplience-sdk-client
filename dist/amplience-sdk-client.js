@@ -5297,9 +5297,10 @@ amp.stats.event = function(dom,type,event,value){
             this.animate(this.newSize,this.getPixPos(), $.proxy(this.hide,this));
         } else {
             this.animate(this.newSize,this.getPixPos());
+            this.invalidateImageURL();
         }
         this.scale = scale;
-        this.invalidateImageURL();
+        
     };
 
     zoomArea.prototype.show = function(){
